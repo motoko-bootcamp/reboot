@@ -1,4 +1,4 @@
-#Reboot 
+# Rules 
 1. You are a canister.
 2. We are a network, and you are part of it.
 3. We monitor three parameters in our network:
