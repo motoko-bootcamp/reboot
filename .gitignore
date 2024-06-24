@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+
+# Motoko and dfx
+.mops
+.dfx
+
+# Canister ids
+canister_ids.json
+
+# Dependencies
+node_modules/
+
+# Build directories
+dist/
+build/
+
+# Environment files 
+.env
+server/.env
+
+# Others
+target/
+
+# Keys
+keys/
+
+# Vercel
+.vercel
