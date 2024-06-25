@@ -5,9 +5,6 @@
 .mops
 .dfx
 
-# Canister ids
-canister_ids.json
-
 # Dependencies
 node_modules/
 

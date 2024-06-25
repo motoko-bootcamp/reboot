@@ -25,7 +25,7 @@ shared ({ caller = creator }) actor class UserCanister() = this {
     };
 
     // Timer to reset the alive status every 24 hours
-    let daily = Timer.recurringTimer(#nanoseconds(nanosecondsPerDay), _kill);
+    let daily = Timer.recurringTimer<system>(#nanoseconds(nanosecondsPerDay), _kill);
 
     // The idea here is to have a function to call every 24 hours to indicate that you are alive
     public shared ({ caller }) func dailyCheck(
