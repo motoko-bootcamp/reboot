@@ -1,10 +1,8 @@
 # Reboot, the game.
 
 <div align="center">
-  <img src="img/reboot.png" alt="reboot" title="Start" />
+  <img src="img/ois_manifesto.png" alt="reboot" title="Start" />
 </div>
-
-Can we self-organize?
 
 ## Official rules
 
@@ -18,10 +16,6 @@ Can we self-organize?
 
 4. Our goal is to survive and expand by adding new rules and elements.
 5. All additions are decided daily by a community vote among 3 options published by the #OIS team.
-
-<div align="center">
-  <img src="img/ois_manifesto.png" alt="reboot" title="Start" />
-</div>
 
 ## Recommendations
 
