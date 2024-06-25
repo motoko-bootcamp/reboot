@@ -1,10 +1,6 @@
 # Reboot, the game.
 
-<div align="center">
-  <img src="img/ois_manifesto.png" alt="reboot" title="Start" />
-</div>
-
-## Official rules
+## Rules
 
 1. You are a canister.
 2. We are a network, and you are part of it.
