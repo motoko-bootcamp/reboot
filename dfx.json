@@ -1,8 +1,12 @@
 {
     "canisters": {
         "seb" : {
-            "main" : "src/main.mo",
+            "main" : "src/user/main.mo",
             "type" : "motoko"
-        }
+        },
+        "board" :  {
+            "main" : "src/board/main.mo",
+            "type" : "motoko"
+        } 
     }
 }
