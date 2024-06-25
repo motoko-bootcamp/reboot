@@ -1,7 +1,7 @@
 # Reboot, the game.
 
 <div align="center">
-  <img src="img/reboot.png" alt="reboot" title="Start" width="300px"/>
+  <img src="img/reboot.png" alt="reboot" title="Start" />
 </div>
 
 Can we self-organize?
@@ -20,7 +20,7 @@ Can we self-organize?
 5. All additions are decided daily by a community vote among 3 options published by the #OIS team.
 
 <div align="center">
-  <img src="img/ois_manifesto.png" alt="reboot" title="Start" width="300px"/>
+  <img src="img/ois_manifesto.png" alt="reboot" title="Start" />
 </div>
 
 ## Recommendations
