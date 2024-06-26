@@ -1,5 +1,9 @@
 # Reboot, the game.
 
+<div align="center">
+  <img src="img/ois_manifesto.png" alt="reboot" title="Start" width="300px" />
+</div>
+
 ## Rules
 
 1. You are a canister.
@@ -15,4 +19,11 @@
 
 ## Recommendations
 
-- Deploy your user-canister in the following subnet: `jtdsg-3h6gi-hs7o5-z2soi-43w3z-soyl3-ajnp3-ekni5-sw553-5kw67-nqe`
+- Deploy your user-canister in the following subnet: `bkfrj-6k62g-dycql-7h53p-atvkj-zg4to-gaogh-netha-ptybj-ntsgw-rqe`
+
+## Useful links
+
+- [Join the game](https://github.com/motoko-bootcamp/you)
+- [Original article](https://medium.com/@seb_icp/reboot-the-game-819bf77de8c4)
+- [YouTube Playlist](https://www.youtube.com/playlist?list=PLl8VueN-2q19TgrPl0VeYWH3nkBxJ6Qol)
+- [Discord](https://discord.gg/bBWsnvjaMx)

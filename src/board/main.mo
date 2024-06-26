@@ -2,7 +2,13 @@ import Http "http";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Array "mo:base/Array";
+import Nat "mo:base/Nat";
+import Int "mo:base/Int";
+import Cycles "mo:base/ExperimentalCycles";
 import Principal "mo:base/Principal";
+import Float "mo:base/Float";
+import Order "mo:base/Order";
+import Prim "mo:⛔";
 actor Board {
 
     public type HttpRequest = Http.Request;
@@ -10,12 +16,21 @@ actor Board {
     public type Name = Text;
     public type Mood = Text;
     public type Time = Time.Time;
+    public type Log = (Name, Mood, Principal, Time);
 
-    stable var logs : [(Name, Mood, Principal, Time)] = [];
+    stable var logs : [Log] = [];
 
     public query func http_request(_request : HttpRequest) : async HttpResponse {
         return ({
-            body = Text.encodeUtf8("Reboot!");
+            body = Text.encodeUtf8(
+                "Open Internet Summer: the summmer where it all started.\n"
+                # "---\n"
+                # _logsToText(logs)
+                # "Cycle Balance: " # Nat.toText(Cycles.balance() / 1_000_000_000_000) # "T\n"
+                # "Heap size (current): " # Nat.toText(Prim.rts_heap_size()) # " bytes" # " ( " # Float.toText(Float.fromInt(Prim.rts_heap_size() / (1024 * 1024))) # "Mb" # " )\n"
+                # "Heap size (max): " # Nat.toText(Prim.rts_max_live_size()) # " bytes" # " ( " # Float.toText(Float.fromInt(Prim.rts_max_live_size() / (1024 * 1024))) # "Mb" # " )\n"
+                # "Memory size: " # Nat.toText(Prim.rts_memory_size()) # " bytes" # " ( " # Float.toText(Float.fromInt(Prim.rts_memory_size() / (1024 * 1024))) # "Mb" # " )\n"
+            );
             headers = [("Content-Type", "text/plain")];
             status_code = 200;
         });
@@ -25,7 +40,7 @@ actor Board {
     // Can only be called once per hour per user
     // The name and mood should be less than 24 characters
     // Logs are stored in the logs array (in chronological order)
-    public shared ({ caller }) func writeDailyCheck(
+    public shared ({ caller }) func reboot_writeDailyCheck(
         name : Name,
         mood : Mood,
     ) : async () {
@@ -53,10 +68,10 @@ actor Board {
     func _isAlive(p : Principal) : async Bool {
         // Creating the actor reference
         let userCanister = actor (Principal.toText(p)) : actor {
-            isAlive : shared () -> async Bool;
+            reboot_isAlive : shared () -> async Bool;
         };
         try {
-            await userCanister.isAlive();
+            await userCanister.reboot_isAlive();
         } catch (err) {
             return false;
         };
@@ -87,9 +102,22 @@ actor Board {
         };
     };
 
-    // Get the logs from the board
+    func _logToText(log : (Name, Mood, Principal, Time)) : Text {
+        return (log.0 # " " # log.1 # " " # Principal.toText(log.2) # " " # Int.toText(log.3));
+    };
 
-    public query func getLogs() : async [(Name, Mood, Principal, Time)] {
+    func _logsToText(logs : [(Name, Mood, Principal, Time)]) : Text {
+        return Array.foldRight<(Name, Mood, Principal, Time), Text>(
+            logs,
+            "Name Mood Principal Time\n---\n",
+            func(log, acc) {
+                return (acc # _logToText(log) # "\n");
+            },
+        );
+    };
+
+    // Get the logs from the board
+    public query func reboot_getLogs() : async [(Name, Mood, Principal, Time)] {
         return logs;
     };
 };
