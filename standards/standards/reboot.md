@@ -21,7 +21,7 @@ Returns the aliveness status of the user.
 ### Reboot_dailyCheck
 
 Enables the user to perform his required daily check to signal his presence in the network and his current mood.
-`reboot_writeDailyCheck : (mood : Mood) -> ()`;
+`reboot_dailyCheck : (mood : Mood) -> ()`;
 
 ### Reboot_supportedStandards
 
