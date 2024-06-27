@@ -81,7 +81,7 @@ accepted.
 
 ### user_sendFriendRequest
 
-This method enable the user to send a friend request to another user, assuming the receiver have implemented the `receiveFriendRequest `
+This method enable the user to send a friend request to another user, assuming the receiver have implemented the `receiveFriendRequest`
 `endpoint. A friend request needs to contains cycles to be accepted.
 
 `user_sendFriendRequest : (receiver : Principal, message : Text) -> FriendRequestResult;`
@@ -96,13 +96,13 @@ This method enables the user to see the pending friend requests that have been s
 
 This method enables the user to accept the friend request.
 
-`user_handleFriendRequest` : (id : Nat, accept : Bool) -> Result<(), Text>;`
+`user_handleFriendRequest : (id : Nat, accept : Bool) -> Result<(), Text>;`
 
 ### user_getFriends
 
 This method enables the user to see his current friends
 
-`user_getFriends` : () -> [Friend];
+`user_getFriends : () -> [Friend]`;
 
 ### user_removeFriend
 
@@ -113,13 +113,13 @@ This method enables the user to see his current friends
 This method enables the user to send a message request to another user assuming the receiver has implemented the `user_receiveMessage` endpoint.
 A message needs to contain at least 1B cycles to be treated. Only user that are your friends can accept your messages.
 
-`user_sendMessage : (canisterId : Principal, message : Text) -> `Result<(), Text>;`
+`user_sendMessage : (canisterId : Principal, message : Text) -> Result<(), Text>;`
 
 ### user_receiveMessage
 
 This method enables the user to receive a message request coming from another user. A message needs to contain at least 1B cycles to be treated. Only your friends can send you messages.
 
-`user_receiveMessage : (message : Text) -> `Result<(), Text>;`
+`user_receiveMessage : (message : Text) -> Result<(), Text>;`
 
 ### user_readMessages
 
