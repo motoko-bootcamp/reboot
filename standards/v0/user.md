@@ -124,7 +124,7 @@ This method enables the user to receive a message request coming from another us
 ### user_readMessages
 
 This method enables the user to access his messages.
-`users_readMessages : () -> [(Nat, Text)];`
+`users_readMessages : () -> [(Nat, Name, Text)];`
 
 ### user_clearMessage
 
