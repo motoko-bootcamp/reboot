@@ -2,6 +2,14 @@
 
 The Reboot standard is a standard for User canister on the Internet Computer.
 
+## Data
+
+### Mood
+
+`Mood` is an alias type of `Text`.
+
+`public type Mood = Text;`
+
 ## Methods
 
 ### Reboot_isAlive
@@ -9,6 +17,11 @@ The Reboot standard is a standard for User canister on the Internet Computer.
 Returns the aliveness status of the user.
 
 `reboot_isAlive: () -> Bool query`
+
+### Reboot_dailyCheck
+
+Enables the user to perform his required daily check to signal his presence in the network and his current mood.
+`reboot_writeDailyCheck : (mood : Mood) -> ()`;
 
 ### Reboot_supportedStandards
 
