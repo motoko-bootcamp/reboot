@@ -8,97 +8,78 @@ import Cycles "mo:base/ExperimentalCycles";
 import Principal "mo:base/Principal";
 import Float "mo:base/Float";
 import Order "mo:base/Order";
+import Result "mo:base/Result";
 import Prim "mo:⛔";
 actor Board {
 
-    public type HttpRequest = Http.Request;
-    public type HttpResponse = Http.Response;
+    stable let version : (Nat, Nat, Nat) = (0, 0, 1);
+
     public type Name = Text;
     public type Mood = Text;
     public type Time = Time.Time;
+    public type Result<Ok, Err> = Result.Result<Ok, Err>;
     public type Log = (Name, Mood, Principal, Time);
 
     stable var logs : [Log] = [];
 
-    public query func http_request(_request : HttpRequest) : async HttpResponse {
-        return ({
-            body = Text.encodeUtf8(
-                "Open Internet Summer: the summmer where it all started.\n"
-                # "---\n"
-                # _logsToText(logs)
-                # "Cycle Balance: " # Nat.toText(Cycles.balance() / 1_000_000_000_000) # "T\n"
-                # "Heap size (current): " # Nat.toText(Prim.rts_heap_size()) # " bytes" # " ( " # Float.toText(Float.fromInt(Prim.rts_heap_size() / (1024 * 1024))) # "Mb" # " )\n"
-                # "Heap size (max): " # Nat.toText(Prim.rts_max_live_size()) # " bytes" # " ( " # Float.toText(Float.fromInt(Prim.rts_max_live_size() / (1024 * 1024))) # "Mb" # " )\n"
-                # "Memory size: " # Nat.toText(Prim.rts_memory_size()) # " bytes" # " ( " # Float.toText(Float.fromInt(Prim.rts_memory_size() / (1024 * 1024))) # "Mb" # " )\n"
-            );
-            headers = [("Content-Type", "text/plain")];
-            status_code = 200;
-        });
+    public type WriteError = {
+        #NotEnoughCycles;
+        #MemoryFull;
+        #NameTooLong;
+        #MoodTooLong;
+        #NotAllowed;
     };
 
-    // Add a daily check to the board
-    // Can only be called once per hour per user
-    // The name and mood should be less than 24 characters
-    // Logs are stored in the logs array (in chronological order)
-    public shared ({ caller }) func reboot_writeDailyCheck(
+    // Write a log to the board
+    // This function is called by the user canister
+    // @cost 1_000_000_000 cycles
+    // @restriction canister
+    // @param name The name of the user (max 32 characters)
+    // @param mood The mood of the user (max 64 characters)
+    public shared ({ caller }) func reboot_board_write(
         name : Name,
         mood : Mood,
-    ) : async () {
+    ) : async Result<(), WriteError> {
 
-        // Check if the name and mood are less than 24 characters
-        if (name.size() > 24 or mood.size() > 24) {
-            return;
+        // Check the available cycles in the call
+        let availableCycles = Cycles.available();
+        let acceptedCycles = Cycles.accept<system>(availableCycles);
+        if (acceptedCycles < 1_000_000_000) {
+            return #err(#NotEnoughCycles);
         };
 
-        // Check if the caller can write (once per hour)
-        if (not (_canWrite(caller))) {
-            return;
+        // Check the length of the name
+        if (name.size() > 32) {
+            return #err(#NameTooLong);
         };
 
-        // Check if the caller is alive
-        if (not (await _isAlive(caller))) {
-            return;
+        // Check the length of the mood
+        if (mood.size() > 64) {
+            return #err(#MoodTooLong);
+        };
+
+        // Check that the caller is a canister
+        // This is a tempory hack that won't work in the future (see the link below for more info)
+        // https://forum.dfinity.org/t/simple-way-to-detect-if-the-caller-is-a-canister-principal-or-any-other-type-of-non-canister-principal/21995/7)
+
+        if (not (Text.endsWith(Principal.toText(caller), #text("cai")))) {
+            return #err(#NotAllowed);
         };
 
         let time = Time.now();
         logs := Array.append(logs, [(name, mood, caller, time)]);
-        return;
+        return #ok();
     };
 
     func _isAlive(p : Principal) : async Bool {
         // Creating the actor reference
-        let userCanister = actor (Principal.toText(p)) : actor {
-            reboot_isAlive : shared () -> async Bool;
+        let user = actor (Principal.toText(p)) : actor {
+            reboot_user_isAlive : shared () -> async Bool;
         };
         try {
-            await userCanister.reboot_isAlive();
+            await user.reboot_user_isAlive();
         } catch (err) {
             return false;
-        };
-    };
-
-    // Check if the user has written on the board in the last 1 hour
-    func _lastWritingTime(p : Principal) : ?Time {
-        for (log in logs.vals()) {
-            if (log.2 == p) {
-                return ?log.3;
-            };
-        };
-        return null;
-    };
-
-    func _canWrite(p : Principal) : Bool {
-        switch (_lastWritingTime(p)) {
-            case null {
-                return true;
-            };
-            case (?lastTime) {
-                let currentTime = Time.now();
-                if ((currentTime - lastTime) >= 60 * 60 * 1_000_000_000) {
-                    return true;
-                };
-                return false;
-            };
         };
     };
 
@@ -116,8 +97,33 @@ actor Board {
         );
     };
 
-    // Get the logs from the board
-    public query func reboot_getLogs() : async [(Name, Mood, Principal, Time)] {
+    // Read the logs from the board
+    public query func reboot_board_read() : async [(Name, Mood, Principal, Time)] {
         return logs;
+    };
+
+    // Returns the version of the board
+    public shared func reboot_board_version() : async (Nat, Nat, Nat) {
+        return version;
+    };
+
+    public type HttpRequest = Http.Request;
+    public type HttpResponse = Http.Response;
+    public query func http_request(_request : HttpRequest) : async HttpResponse {
+        return ({
+            body = Text.encodeUtf8(
+                "Open Internet Summer: the summmer where it all started.\n"
+                # "---\n"
+                # _logsToText(logs)
+                # "---\n"
+                # "Version: " # Nat.toText(version.0) # "." # Nat.toText(version.1) # "." # Nat.toText(version.2) # "\n"
+                # "Cycle Balance: " # Nat.toText(Cycles.balance()) # " cycles " # "(" # Nat.toText(Cycles.balance() / 1_000_000_000_000) # " T" # ")\n"
+                # "Heap size (current): " # Nat.toText(Prim.rts_heap_size()) # " bytes " # "(" # Float.toText(Float.fromInt(Prim.rts_heap_size() / (1024 * 1024))) # " Mb" # ")\n"
+                # "Heap size (max): " # Nat.toText(Prim.rts_max_live_size()) # " bytes " # "(" # Float.toText(Float.fromInt(Prim.rts_max_live_size() / (1024 * 1024))) # " Mb" # ")\n"
+                # "Memory size: " # Nat.toText(Prim.rts_memory_size()) # " bytes " # "(" # Float.toText(Float.fromInt(Prim.rts_memory_size() / (1024 * 1024))) # " Mb" # ")\n"
+            );
+            headers = [("Content-Type", "text/plain")];
+            status_code = 200;
+        });
     };
 };
