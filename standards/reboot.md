@@ -30,4 +30,4 @@ Returns a list of the supported standards this user implements.
 `reboot_supportedStandards: () -> (vec record { name : text; url : text }) query;`
 
 The result of the call should always have at least one entry,
-`record { name = "Reboot"; url = "https://github.com/motoko-bootcamp/reboot/standards/reboot.md" }
+`record { name = "Reboot"; url = "https://github.com/motoko-bootcamp/reboot/blob/main/standards/reboot.md" }
